@@ -1,30 +1,64 @@
 <template>
   <div class="home">
-   <div class="container">
-       <div class="row">
-           <div class="col text-left">
-               <h2>Lista de consultas</h2>
-                  <div v-for="item in inquiries" :key="item">
-                    <h3><span class="badge badge-success">* {{item.id}} - {{item.id}}</span></h3>
-                    <button class="btn btn-primary">hola</button>
-                    <div v-html="item.id"></div>
+    <br><br>
+    <div class="row justify-content-center">
+        <div class="col-5">
+            <Chart></Chart>
+        </div>
+        <div class="col-3">
+            
+        <div class="container">
+            <div class="row">
+                <div class="col text-left">
+                    <h3>Lista de consultas</h3>
+                    <div style="width: 400px; height: 400px; overflow-y: scroll;">
+                         <table class="table table-dark">
+                            <thead>
+                                <tr>
+                                <th scope="col">Id</th>
+                                <th scope="col">Palabra</th>
+                                <th scope="col">Número Busquedas</th>
+                                <th scope="col">Número Resultados</th>
+                                </tr>
+                            </thead>
+                            <tbody v-for="item in inquiries" :key="item">
+                                <tr>
+                                <td>{{item.id}}</td>
+                                <td>{{item.word}}</td>
+                                <td>{{item.number_searches}}</td>
+                                <td>{{item.number_results}}</td>
+                                </tr>
+                            </tbody>
+                            </table>
+                    </div>
+                   
                 </div>
-           </div>
-       </div>
-   </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
+import { Bar } from 'vue-chartjs'
 import axios from 'axios'
 import HelloWorld from '@/components/HelloWorld.vue'
+import Chart from '@/components/Inquiries/chart.vue'
 
 export default {
   name: 'Home',
   components: {
-    HelloWorld
+    HelloWorld,
+    Chart
   },
+
+  extends: Bar,
+  mounted () {
+    this.getInquiries()
+  },    
 
   data(){
       return {
@@ -37,26 +71,11 @@ export default {
           const path = 'http://127.0.0.1:8000/api/inquiries/'
           axios.get('http://127.0.0.1:8000/api/inquiries/').then((response) => {
               this.inquiries = response.data
-              console.log(this.inquiries)
           })
           .catch((error) => {
               console.log(error)
           })
       },
-
-      searchWord(){
-        if(this.word.trim() == ""){
-            this.$swal('Error','Digíta una palabra!!!');
-            this.objects = []
-        }else{
-            const url = "https://en.wikipedia.org/w/api.php?action=query&list=search&srprop=snippet&format=json&origin=*&utf8=&srsearch="
-            axios.get(url+this.word).then(resp => {
-            console.log(resp.data.query.search);
-            this.objects = resp.data.query.search;
-            this.word = ""
-        });
-        }
-      }
   },
   created(){
       this.getInquiries()
